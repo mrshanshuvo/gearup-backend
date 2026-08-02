@@ -75,7 +75,9 @@ const createPaymentIntentInDB = async (
 
 const confirmPaymentInDB = async (transactionId: string) => {
   const isMock =
-    transactionId.startsWith("mock_") || process.env.NODE_ENV !== "production";
+    transactionId.startsWith("mock_") ||
+    process.env.ALLOW_MOCK_PAYMENTS === "true" ||
+    process.env.NODE_ENV !== "production";
 
   if (!isMock) {
     const paymentIntent = await stripe.paymentIntents.retrieve(transactionId);

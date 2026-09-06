@@ -1,99 +1,253 @@
-# Express Prisma Stripe Zod Boilerplate
+# GearUp - L2B7A4
 
-A production-ready, type-safe Express.js backend boilerplate integrated with PostgreSQL, Prisma, Zod request validation, and optional Stripe payments.
+A sports and outdoor equipment rental platform where customers can rent gear, providers can manage their inventory, and admins can manage the platform.
+
+## Overview
+
+GearUp makes it easy to discover and rent sports and outdoor equipment.
+
+The platform supports three main roles:
+
+* **Customer** — Browse gear, place rental orders, make payments, track rentals, and leave reviews.
+* **Provider** — Add and manage gear, manage stock, and handle rental orders.
+* **Admin** — Manage users, gear listings, categories, and rental orders.
 
 ## Features
 
-- **TypeScript**: Full static typing and modern compilation.
-- **Express.js**: Fast, unopinionated, minimalist web framework.
-- **Prisma ORM**: Modern database access with type-safety and multi-file schema management.
-- **Zod Validation**: Request payload validation (Zod v4) with unified error responses.
-- **Startup Environment Variable Validation**: Immediate failure on startup if critical configuration is missing.
-- **Authentication**: JWT-based access and refresh token authentication with role-based route guard middleware.
-- **Stripe Payments Ready**: Complete library setup, raw body parser middleware for Stripe webhooks, and proxy run script.
-- **Global Error Handling**: Comprehensive parsing of Prisma query, validation, connection, and general server exceptions.
+### Customer
 
----
+* Register and login
+* Browse sports and outdoor gear
+* Search and filter gear
+* View gear details
+* Select rental dates
+* Place rental orders
+* Make payments
+* View payment history
+* Track rental status
+* Leave reviews after returning gear
+* Manage profile
 
-## Directory Structure
+### Provider
+
+* Register and login
+* Add new gear
+* Update gear information
+* Remove gear
+* Manage inventory and stock
+* View rental orders
+* Update rental order status
+
+### Admin
+
+* Manage users
+* Suspend or activate users
+* Manage gear listings
+* Manage rental orders
+* Manage gear categories
+
+## Payment
+
+GearUp supports online payments through:
+
+* Stripe
+* SSLCommerz
+
+Payment records include transaction information, amount, payment method, provider, status, and payment date.
+
+## Rental Flow
 
 ```text
-src/
-├── config/              # Centralized environment variable config & startup validation
-├── lib/                 # Core library clients (Prisma, Stripe)
-├── middlewares/         # Express middlewares (auth, globalErrorHandler, notFound, validateRequest)
-├── modules/             # App features (user, auth)
-│   ├── auth/            # Auth controller, routing, and schema validations
-│   └── user/            # User registration & profile management
-├── utils/               # Shared helpers (catchAsync, jwt, sendResponse)
-├── app.ts               # Express application configuration
-└── server.ts            # Entrypoint file starting database & web server
-prisma/
-├── schema/              # Multi-file database model definitions
-└── seed.ts              # Database seeding script (default admin & user accounts)
+Browse Gear
+    ↓
+View Gear Details
+    ↓
+Place Rental Order
+    ↓
+Make Payment
+    ↓
+Pick Up Gear
+    ↓
+Return Gear
+    ↓
+Leave Review
 ```
 
----
+## Rental Order Status
 
-## Setup Instructions
+```text
+PLACED
+  │
+  ├──→ CANCELLED
+  │
+  ↓
+CONFIRMED
+  │
+  ↓
+PAID
+  │
+  ↓
+PICKED_UP
+  │
+  ↓
+RETURNED
+```
 
-### 1. Install Dependencies
+## Main Entities
+
+```text
+Users
+  │
+  ├── GearItems
+  │
+  ├── RentalOrders
+  │       │
+  │       └── Payments
+  │
+  └── Reviews
+
+Categories
+  │
+  └── GearItems
+```
+
+### Core Tables
+
+| Table        | Purpose                                     |
+| ------------ | ------------------------------------------- |
+| Users        | User information, authentication, and roles |
+| GearItems    | Sports and outdoor equipment                |
+| Categories   | Gear categories                             |
+| RentalOrders | Rental orders and rental dates              |
+| Payments     | Payment transactions                        |
+| Reviews      | Customer reviews                            |
+
+## API Modules
+
+### Authentication
+
+* Register
+* Login
+* Get current user
+
+### Gear
+
+* Get all gear
+* Get gear details
+* Search and filter gear
+* Get categories
+
+### Rental Orders
+
+* Create rental order
+* View rental orders
+* View rental details
+* Update rental status
+
+### Payments
+
+* Create payment
+* Confirm payment
+* View payment history
+* View payment details
+
+### Provider Management
+
+* Manage gear inventory
+* View provider orders
+* Update order status
+
+### Reviews
+
+* Create reviews after rental completion
+
+### Admin
+
+* Manage users
+* Manage gear
+* Manage categories
+* Manage rental orders
+
+## Tech Stack
+
+* Node.js
+* Express.js
+* TypeScript
+* PostgreSQL
+* Prisma
+* JWT Authentication
+* Stripe
+* SSLCommerz
+* REST API
+
+## Project Structure
+
+```text
+gearup/
+├── src/
+├── prisma/
+├── .env
+├── package.json
+├── tsconfig.json
+└── README.md
+```
+
+## Getting Started
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/mrshanshuvo/gearup.git
+cd gearup
+```
+
+### 2. Install dependencies
 
 ```bash
 npm install
 ```
 
-### 2. Configure Environment Variables
+### 3. Configure environment variables
 
-Duplicate the template file and fill in your values (database URLs, JWT secrets, Stripe secrets):
+Create a `.env` file and add the required database, authentication, and payment credentials.
 
-```bash
-cp .env.example .env
+```env
+DATABASE_URL=
+JWT_SECRET=
+
+STRIPE_SECRET_KEY=
+
+SSLCOMMERZ_STORE_ID=
+SSLCOMMERZ_STORE_PASSWORD=
 ```
 
-### 3. Generate Prisma Client
-
-Build the database models and generate TypeScript types:
+### 4. Run database migrations
 
 ```bash
-npx prisma generate
+npx prisma migrate dev
 ```
 
-### 4. Push Database Schema
-
-Sync your database structure with the Prisma schema:
-
-```bash
-npx prisma db push
-```
-
-### 5. Seed the Database
-
-Populate your database with default Admin (`admin@example.com` / `admin123`) and User (`user@example.com` / `user123`) accounts:
-
-```bash
-npx prisma db seed
-```
-
-### 6. Start the Server
-
-#### Development Mode (auto-reload on change):
+### 5. Start the development server
 
 ```bash
 npm run dev
 ```
 
-#### Production Mode (build & run compiled js):
+## Learning Goals
 
-```bash
-npm run build
-npm start
-```
+This project demonstrates:
 
-### 7. Run Stripe Webhook Proxy (Optional)
+* REST API development
+* Role-based access control
+* JWT authentication
+* Relational database design
+* Inventory management
+* Rental order management
+* Payment integration
+* PostgreSQL and Prisma
+* API architecture
+* Backend application development
 
-If using Stripe webhooks locally, listen and forward events to your endpoint:
+## License
 
-```bash
-npm run stripe:webhook
-```
+This project is licensed under the [MIT License](./LICENSE).
